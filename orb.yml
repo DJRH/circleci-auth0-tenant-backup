@@ -1,0 +1,30 @@
+version: 2.1
+description: >
+  An orb to backup an Auth0 tenant configuration to an S3 bucket. Expects AWS keys to be set as env vars.
+
+commands:
+  s3-backup:
+    description: Backup Auth0 tenant config in S3
+    parameters:
+      auth0-domain:
+        type: string
+        description: The CircleCI API token
+      auth0-client-id:
+        type: string
+        description: The CircleCI team/organisation name
+      auth0-client-secret:
+        type: string
+        description: The Slack webhook to post the message to
+      auth0-s3-location:
+        type: string
+        description: The Slack webhook to post the message to
+      auth0-allow-delete:
+        type: string
+        description: Whether to allow deletes
+        default: false
+    steps:
+      - run:
+          name: Backup Auth0 tenant config in an S3 bucket
+          command: |
+            AUTH0_DOMAIN=<< parameters.auth0-domain >> AUTH0_CLIENT_ID=<< parameters.auth0-client-id >> AUTH0_CLIENT_SECRET=<< parameters.auth0-client-secret >> AUTH0_ALLOW_DELETE=<< parameters.auth0-allow-delete >> a0deploy export --format yaml --output_folder .
+            aws s3 cp tenant.yaml s3://<< parameters.auth0-s3-location >>/ --sse
