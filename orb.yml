@@ -21,7 +21,7 @@ commands:
       auth0-allow-delete:
         type: string
         description: Whether to allow deletes
-        default: false
+        default: "false"
       aws-access-key:
         type: string
         description: The AWS access key ID with write permissions to the S3 location
