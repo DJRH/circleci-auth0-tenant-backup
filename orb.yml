@@ -1,6 +1,6 @@
 version: 2.1
 description: >
-  An orb to backup an Auth0 tenant configuration to an S3 bucket. Expects AWS keys to be set as env vars.
+  An orb to backup an Auth0 tenant configuration to an S3 bucket.
 
 commands:
   s3-backup:
@@ -8,23 +8,29 @@ commands:
     parameters:
       auth0-domain:
         type: string
-        description: The CircleCI API token
+        description: The Auth0 domain of the tenant to be backed up
       auth0-client-id:
         type: string
-        description: The CircleCI team/organisation name
+        description: The client ID for the Auth0 application with permitted scopes to the Management API
       auth0-client-secret:
         type: string
-        description: The Slack webhook to post the message to
+        description: The client secret for the Auth0 application with permitted scopes to the Management API
       auth0-s3-location:
         type: string
-        description: The Slack webhook to post the message to
+        description: The S3 location to write the Auth0 backup YAML to (e.g. "my-bucket")
       auth0-allow-delete:
         type: string
         description: Whether to allow deletes
         default: false
+      aws-access-key:
+        type: string
+        description: The AWS access key ID with write permissions to the S3 location
+      aws-secret-key:
+        type: string
+        description: The AWS secret access key with write permissions to the S3 location
     steps:
       - run:
           name: Backup Auth0 tenant config in an S3 bucket
           command: |
             AUTH0_DOMAIN=<< parameters.auth0-domain >> AUTH0_CLIENT_ID=<< parameters.auth0-client-id >> AUTH0_CLIENT_SECRET=<< parameters.auth0-client-secret >> AUTH0_ALLOW_DELETE=<< parameters.auth0-allow-delete >> a0deploy export --format yaml --output_folder .
-            aws s3 cp tenant.yaml s3://<< parameters.auth0-s3-location >>/ --sse
+            AWS_ACCESS_KEY_ID=<< parameters.aws-access-key >> AWS_SECRET_ACCESS_KEY=<< parameters.aws-secret-key >> aws s3 cp tenant.yaml s3://<< parameters.auth0-s3-location >>/ --sse
